@@ -1,0 +1,88 @@
+##################################################
+## BAYESIAN AND FREQUENTIST MULTIPLE REGRESSION ##
+##################################################
+
+################################
+## PHP 2530 Final Project     ##
+## Last Updated: 9 April 2019 ##
+## ZK Began Github Set-up     ##
+################################
+
+######################
+## LOADING PACKAGES ##
+######################
+
+library(psych)
+library(BaylorEdPsych)
+library(MissMech)
+library(ggplot2)
+library(BAS)
+
+#################
+## DATA SET-UP ##
+#################
+
+#Importing
+
+#Subset for beginning of semester only
+
+#Explore amount of data missing
+#Little MCAR/Modified Hawkins Test
+#MVN Test
+#Impute missing data
+
+#Scoring Scales (remember to use RowMeans)
+
+#######################
+## ASSUMPTION CHECKS ##
+#######################
+
+#check skewness/kurtosis
+#check density plots
+#check multicollinearity
+
+############################
+## DESCRIPTIVE STATISTICS ##
+## AND DEMOGRAPHICS       ##
+############################
+
+#age, gender, race/ethnicity frequencies
+#M/SD for continuous covariates
+#F/% for categorical covariates
+
+####################
+## FREQUENTIST MR ##
+####################
+
+#Run Full Model
+Full.Frequentist.Model <- lm(AlcoholUseB ~ ., data = BeginningOnlyImputed)
+summary(Full.Frequentist.Model)
+plot(Full.Frequentist.Model)
+
+#Use backwards elimination to remove variables
+step(Full.Frequentist.Model, direction = "backward", trace=FALSE)
+
+#At this point, re-run reduced model, interpret results, plot for diagnostics if needed
+
+#################
+## BAYESIAN MR ##
+#################
+
+#Run Full Model. We probably want to be crystal clear why we're choosing the ZS-null and uniform priors in the paper.
+
+Full.Bayesian.Model <- bas.lm(AlcoholUseB ~ ., data = BeginningOnlyImputed, method = "MCMC", prior = "ZS-null", modelprior = uniform())
+
+summary(Full.Bayesian.Model)
+#Use results from the summary to create the reduced model. Compare and contrast with frequentist/backwards selection results.
+
+#At this point, re-run reduced model, interpret results, provide plots.
+
+coef(model) provides beta, confint(model) provides beta and 95% credible intervals
+
+############################
+## PREDICTIVE PERFORMANCE ##
+############################
+
+#save predicted scores of F-MR and B-MR
+#plot against true values of alcohol use
+#could also try to fit values to second data set (F17)
