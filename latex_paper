@@ -1,0 +1,57 @@
+\documentclass[a4paper,man,natbib,11pt]{article}
+\textwidth=7in
+\textheight=9.5in
+\topmargin=-1in
+\headheight=0in
+\headsep=.5in
+\hoffset  -.85in
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{apacite}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,quotes}
+\usepackage{lineno}
+\linenumbers
+
+
+\title{A Prior Nightmare}
+\date{~}
+\author{Caroline M. Mills, ?? \\~\\ Zachary J. Kunicki, PhD, MS\\Brown University}
+
+\begin{document}
+\maketitle
+\newpage
+\begin{abstract}
+\noindent TBD
+Keywords: \textit{alcohol use, anxiety, undergraduate students, Bayesian}	
+\end{abstract}
+\newpage
+
+\section*{Literature Review}
+
+\section*{Methods}
+
+\subsection*{Participants}
+
+\subsection*{Materials}
+
+\subsubsection*{Measures} 
+
+\subsection*{Procedure} 
+
+\subsection*{Data Analysis}
+
+\section*{Results}
+
+\section*{Discussion}
+\subsection*{Limitations}
+
+\subsection*{Implications and Future Directions}
+
+\bibliography{apriornightmare}
+\bibliographystyle{plain}
+
+\end{document}
