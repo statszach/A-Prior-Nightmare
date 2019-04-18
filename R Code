@@ -77,6 +77,12 @@ summary(Full.Bayesian.Model)
 
 #At this point, re-run reduced model, interpret results, provide plots.
 
+#Compare posterior distribution of beta values to posterior expected value of predictions 
+
+#Test the model by seeing how to preforms when we plug in specific covariate values 
+
+#Examine outliers by Bayesian residual analysis 
+
 coef(model) provides beta, confint(model) provides beta and 95% credible intervals
 
 ############################
