@@ -1,12 +1,13 @@
+
 ##################################################
 ## BAYESIAN AND FREQUENTIST MULTIPLE REGRESSION ##
 ##################################################
 
-################################
-## PHP 2530 Final Project     ##
-## Last Updated: 9 April 2019 ##
-## ZK Began Github Set-up     ##
-################################
+#################################
+## PHP 2530 Final Project      ##
+## Last Updated: 18 April 2019 ##
+## ZK continued Set-up         ##
+#################################
 
 ######################
 ## LOADING PACKAGES ##
@@ -17,6 +18,9 @@ library(BaylorEdPsych)
 library(MissMech)
 library(ggplot2)
 library(BAS)
+library(readxl)
+library(dplyr) 
+
 
 #################
 ## DATA SET-UP ##
@@ -24,22 +28,82 @@ library(BAS)
 
 #Importing
 
+ThesisSP18Data <- read_excel("~/Graduate School/URI Statistics MS/STA 599 Thesis/Thesis Analyses/ThesisSP18Data.xlsx")
+S18 <- ThesisSP18Data
+
 #Subset for beginning of semester only
 
+S18BaselineItems <- c("QuantClassB",	"OtherQuantClassB",	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB",	"GPAB_Text",
+"QANX1B",	"QANX2B",	"QANX3B",	"QANX4B",	
+"SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B",
+"AlcoholYNB",	"AlcoholB",	"BingeYNB",	"BingeB",	
+"Subsscreen1B",	"Subsscreen2B",	"Subsscreen3B",	"Subsscreen4B",	"Subsscreen5B",	"Subsscreen6B",	"Subsscreen7B",	"Subsscreen8B",	"Subsscreen9B",
+"DASS1B",	"DASS2B",	"DASS3B",	"DASS4B",	"DASS5B",	"DASS6B",	"DASS7B",	
+"DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"DASS13B",	"DASS14B",	
+"DASS15B", "DASS16B",	"DASS17B",	"DASS18B",	"DASS19B",	"DASS20B",	"DASS21B")
+
+S18Baseline <- S18[S18BaselineItems]
+
+#Omitting all fully missing observations
+
+S18BaselineOnly <- S18Baseline[rowSums(is.na(S18Baseline)) !=ncol(S18Baseline), ]
+
+#Demographics
+## ALL NEED TO BE RECODED ##
+table(S18BaselineOnly$GenderB)
+table(S18BaselineOnly$RaceEthB)
+table(S18BaselineOnly$OtherQuantClassB)
+table(S18BaselineOnly$ExpGradeB)
+table(S18BaselineOnly$StuStaB)
+table(S18BaselineOnly$GPAB)
+
+#Scoring Scales 
+#Remember - using RowMeans in case of any items missing within-measure
+
+QuantAnxietyItems <- c("QANX1B",	"QANX2B",	"QANX3B",	"QANX4B")
+ExamAnxietyItems <- c("SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B")
+SAScreenerItems <- c("Subsscreen1B",	"Subsscreen2B",	"Subsscreen3B",	"Subsscreen4B",	"Subsscreen5B",	"Subsscreen6B",	"Subsscreen7B",	"Subsscreen8B",	"Subsscreen9B")
+DASSStressItems <- c("DASS1B",	"DASS2B",	"DASS3B",	"DASS4B",	"DASS5B",	"DASS6B",	"DASS7B")
+DASSAnxietyItems <- c("DASS15B", "DASS16B",	"DASS17B",	"DASS18B",	"DASS19B",	"DASS20B",	"DASS21B")
+DASSDepressionItems <- c("DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"DASS13B",	"DASS14B")
+
+
+OtherQuantClassB,	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB"
+
+S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(QuantClassB,  AlcoholB, BingeB,
+  QuantAnxiety = rowMeans(select(., QuantAnxietyItems)),
+  ExamAnxiety = rowMeans(select(., ExamAnxietyItems)),
+  SubsUseScreener = rowMeans(select(., SAScreenerItems)),                                                      
+  DASS_Stress = rowMeans(select(., DASSStressItems)),
+  DASS_Anxiety = rowMeans(select(., DASSAnxietyItems)),
+  DASS_Depression = rowMeans(select(., DASSDepressionItems))
+  )
+
+
 #Explore amount of data missing
+
 #Little MCAR/Modified Hawkins Test
 #MVN Test
 #Impute missing data
 
-#Scoring Scales (remember to use RowMeans)
+
+
+
 
 #######################
 ## ASSUMPTION CHECKS ##
 #######################
 
 #check skewness/kurtosis
-#check density plots
-#check multicollinearity
+
+describe(S18BaselineOnlyScored$AlcoholB)
+describe(S18BaselineOnlyScored$BingeB)
+describe(S18BaselineOnlyScored$QuantAnxiety)
+describe(S18BaselineOnlyScored$SubsUseScreener)
+describe(S18BaselineOnlyScored$ExamAnxiety)
+describe(S18BaselineOnlyScored$DASS_Stress)
+describe(S18BaselineOnlyScored$DASS_Anxiety)
+describe(S18BaselineOnlyScored$DASS_Depression)
 
 ############################
 ## DESCRIPTIVE STATISTICS ##
