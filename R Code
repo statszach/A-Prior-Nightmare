@@ -1,19 +1,25 @@
-
 ##################################################
 ## BAYESIAN AND FREQUENTIST MULTIPLE REGRESSION ##
 ##################################################
 
+################################
+## PHP 2530 Final Project     ##
+## Last Updated: 9 April 2019 ##
+## ZK Began Github Set-up     ##
+################################
 #################################
 ## PHP 2530 Final Project      ##
 ## Last Updated: 18 April 2019 ##
 ## ZK continued Set-up         ##
 #################################
+#################################
+## PHP 2530 Final Project      ##
+## Last Updated: 20 April 2019 ##
+## CM demographics coded       ##
+#################################
 
 ######################
 ## LOADING PACKAGES ##
-######################
-
-library(psych)
 library(BaylorEdPsych)
 library(MissMech)
 library(ggplot2)
@@ -27,20 +33,19 @@ library(dplyr)
 #################
 
 #Importing
-
-ThesisSP18Data <- read_excel("~/Graduate School/URI Statistics MS/STA 599 Thesis/Thesis Analyses/ThesisSP18Data.xlsx")
-S18 <- ThesisSP18Data
+data2 <- read_excel("Bayesian final project/student data .xlsx")
+S18 <- data2
 
 #Subset for beginning of semester only
 
 S18BaselineItems <- c("QuantClassB",	"OtherQuantClassB",	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB",	"GPAB_Text",
-"QANX1B",	"QANX2B",	"QANX3B",	"QANX4B",	
-"SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B",
-"AlcoholYNB",	"AlcoholB",	"BingeYNB",	"BingeB",	
-"Subsscreen1B",	"Subsscreen2B",	"Subsscreen3B",	"Subsscreen4B",	"Subsscreen5B",	"Subsscreen6B",	"Subsscreen7B",	"Subsscreen8B",	"Subsscreen9B",
-"DASS1B",	"DASS2B",	"DASS3B",	"DASS4B",	"DASS5B",	"DASS6B",	"DASS7B",	
-"DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"DASS13B",	"DASS14B",	
-"DASS15B", "DASS16B",	"DASS17B",	"DASS18B",	"DASS19B",	"DASS20B",	"DASS21B")
+                      "QANX1B",	"QANX2B",	"QANX3B",	"QANX4B",	
+                      "SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B",
+                      "AlcoholYNB",	"AlcoholB",	"BingeYNB",	"BingeB",	
+                      "Subsscreen1B",	"Subsscreen2B",	"Subsscreen3B",	"Subsscreen4B",	"Subsscreen5B",	"Subsscreen6B",	"Subsscreen7B",	"Subsscreen8B",	"Subsscreen9B",
+                      "DASS1B",	"DASS2B",	"DASS3B",	"DASS4B",	"DASS5B",	"DASS6B",	"DASS7B",	
+                      "DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"DASS13B",	"DASS14B",	
+                      "DASS15B", "DASS16B",	"DASS17B",	"DASS18B",	"DASS19B",	"DASS20B",	"DASS21B")
 
 S18Baseline <- S18[S18BaselineItems]
 
@@ -51,7 +56,7 @@ S18BaselineOnly <- S18Baseline[rowSums(is.na(S18Baseline)) !=ncol(S18Baseline), 
 #Demographics
 ## ALL NEED TO BE RECODED ##
 table(S18BaselineOnly$GenderB)
-table(S18BaselineOnly$RaceEthB)
+table(S18BaselineOnly$RaceEth_B)
 table(S18BaselineOnly$OtherQuantClassB)
 table(S18BaselineOnly$ExpGradeB)
 table(S18BaselineOnly$StuStaB)
@@ -60,6 +65,45 @@ table(S18BaselineOnly$GPAB)
 #Scoring Scales 
 #Remember - using RowMeans in case of any items missing within-measure
 
+#demographic recoding 
+#exclude values equal to 0 since they are missing 
+S18BaselineOnly <- S18BaselineOnly[S18BaselineOnly$GenderB!=0 & S18BaselineOnly$GenderB!="Transgender", ]
+#re-coding demographics 
+View(S18BaselineOnly)
+S18BaselineOnly$GenderB <- ifelse(S18BaselineOnly$GenderB == "Female", 0, ifelse(S18BaselineOnly$GenderB == "Male",1 ,99))
+
+S18BaselineOnly$RaceEth_B <- ifelse(S18BaselineOnly$RaceEth_B == "White/European Descent", 1, 0)
+
+S18BaselineOnly$OtherQuantClassB <- ifelse(S18BaselineOnly$OtherQuantClassB ==0,0, 
+                                    ifelse(S18BaselineOnly$OtherQuantClassB =="No", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "no",0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB =="Hell No", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "N/A", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "NO", 0,   
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "unknown", 0, 1)))))))
+
+S18BaselineOnly$ExpGradeB <-ifelse(S18BaselineOnly$ExpGradeB == "A", 3, 
+                            ifelse(S18BaselineOnly$ExpGradeB == "B",2,
+                            ifelse(S18BaselineOnly$ExpGradeB == "C",1,0)))
+
+S18BaselineOnly$StuStaB <-ifelse(S18BaselineOnly$StuStaB == "Freshman",1,
+                          ifelse(S18BaselineOnly$StuStaB=="Sophomore",2, 
+                          ifelse(S18BaselineOnly$StuStaB=="Junior",3, 
+                          ifelse(S18BaselineOnly$StuStaB=="Senior",4,
+                          ifelse(S18BaselineOnly$StuStaB=="Not listed, please fill in:",5,99)))))
+
+S18BaselineOnly$GPAB_Text<- as.numeric(S18BaselineOnly$GPAB_Text)
+#Replace all values  "Not listed, please fill in:" with text from GPAB_Text
+select <- S18BaselineOnly$GPAB=="Not listed, please fill in:"
+S18BaselineOnly[select, "GPAB"] <- S18BaselineOnly[select, "GPAB_Text"]
+#Cateorize GPA
+#############Still need to finish, unsure how we should group GPA #########
+S18BaselineOnly$GPAB<- as.numeric(S18BaselineOnly$GPAB )
+S18BaselineOnly$GPAB <- ifelse(S18BaselineOnly$GPAB < 2.5, 1,
+                        ifelse(S18BaselineOnly$GPAB>=2.5&S18BaselineOnly$GPAB<3, 2,
+                        ifelse(S18BaselineOnly$GPAB>=3 & S18BaselineOnly$GPAB <3.5, 3,
+                        ifelse(S18BaselineOnly$GPAB>=3.5,4,99 ))))
+
 QuantAnxietyItems <- c("QANX1B",	"QANX2B",	"QANX3B",	"QANX4B")
 ExamAnxietyItems <- c("SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B")
 SAScreenerItems <- c("Subsscreen1B",	"Subsscreen2B",	"Subsscreen3B",	"Subsscreen4B",	"Subsscreen5B",	"Subsscreen6B",	"Subsscreen7B",	"Subsscreen8B",	"Subsscreen9B")
@@ -67,17 +111,25 @@ DASSStressItems <- c("DASS1B",	"DASS2B",	"DASS3B",	"DASS4B",	"DASS5B",	"DASS6B",
 DASSAnxietyItems <- c("DASS15B", "DASS16B",	"DASS17B",	"DASS18B",	"DASS19B",	"DASS20B",	"DASS21B")
 DASSDepressionItems <- c("DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"DASS13B",	"DASS14B")
 
-
+#Not sure why this is here
 OtherQuantClassB,	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB"
 
 S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(QuantClassB,  AlcoholB, BingeB,
-  QuantAnxiety = rowMeans(select(., QuantAnxietyItems)),
-  ExamAnxiety = rowMeans(select(., ExamAnxietyItems)),
-  SubsUseScreener = rowMeans(select(., SAScreenerItems)),                                                      
-  DASS_Stress = rowMeans(select(., DASSStressItems)),
-  DASS_Anxiety = rowMeans(select(., DASSAnxietyItems)),
-  DASS_Depression = rowMeans(select(., DASSDepressionItems))
-  )
+                                                       QuantAnxiety = rowMeans(select(., QuantAnxietyItems)),
+                                                       ExamAnxiety = rowMeans(select(., ExamAnxietyItems)),
+                                                       SubsUseScreener = rowMeans(select(., SAScreenerItems)),                                                      
+                                                       DASS_Stress = rowMeans(select(., DASSStressItems)),
+                                                       DASS_Anxiety = rowMeans(select(., DASSAnxietyItems)),
+                                                       DASS_Depression = rowMeans(select(., DASSDepressionItems)),
+                                                       Gender = S18BaselineOnly$GenderB,
+                                                       Year = S18BaselineOnly$StuStaB,
+                                                       Quantative_Class =S18BaselineOnly$OtherQuantClassB,
+                                                       Expected_Grade = S18BaselineOnly$ExpGradeB,
+                                                       Race = S18BaselineOnly$RaceEth_B, 
+                                                       GPA = S18BaselineOnly$GPAB
+                                                       
+)
+
 
 
 #Explore amount of data missing
@@ -86,6 +138,7 @@ S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(QuantClassB,  AlcoholB, B
 #MVN Test
 #Impute missing data
 
+#Scoring Scales (remember to use RowMeans)
 
 
 
