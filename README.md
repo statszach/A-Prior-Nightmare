@@ -60,6 +60,8 @@ https://towardsdatascience.com/linear-and-bayesian-modelling-in-r-predicting-mov
 
 Bae-sian Linear Regression:
 https://github.com/WillKoehrsen/Data-Analysis/blob/master/bayesian_lr/Bayesian%20Linear%20Regression%20Demonstration.ipynb
+
+Bae-sian Linear Regression Code:
 https://towardsdatascience.com/introduction-to-bayesian-linear-regression-e66e60791ea7
 
 Bae-sian Missing Data: https://cran.r-project.org/web/packages/brms/vignettes/brms_missings.html
