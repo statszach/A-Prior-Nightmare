@@ -58,5 +58,9 @@ Useful Links:
 Bae-sian and Lame-quentist MR:
 https://towardsdatascience.com/linear-and-bayesian-modelling-in-r-predicting-movie-popularity-6c8ef0a44184
 
+Bae-sian Linear Regression:
+https://github.com/WillKoehrsen/Data-Analysis/blob/master/bayesian_lr/Bayesian%20Linear%20Regression%20Demonstration.ipynb
+https://towardsdatascience.com/introduction-to-bayesian-linear-regression-e66e60791ea7
 
 Bae-sian Missing Data: https://cran.r-project.org/web/packages/brms/vignettes/brms_missings.html
+
