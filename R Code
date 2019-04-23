@@ -200,14 +200,24 @@ ols_plot_dffits(backwards.model)
 
 #Run Full Model. We probably want to be crystal clear why we're choosing the ZS-null and uniform priors in the paper.
 
-Full.Bayesian.Model <- bas.lm(AlcoholUseB ~ ., data = BeginningOnlyImputed, method = "MCMC", prior = "ZS-null", modelprior = uniform())
-
+Full.Bayesian.Model <- bas.lm(AlcoholB ~ AlcoholB ~ .,
+                              data =finaldf, 
+                              method = "MCMC",
+                              prior = "ZS-null",
+                              modelprior = uniform())
 summary(Full.Bayesian.Model)
+
 #Use results from the summary to create the reduced model. Compare and contrast with frequentist/backwards selection results.
 
 #At this point, re-run reduced model, interpret results, provide plots.
 
 #Compare posterior distribution of beta values to posterior expected value of predictions 
+coef_model <- coef(Full.Bayesian.Model)
+par(mfrow=c(2,5))
+plot(coef_model, subset = c(1,2,3,4,5,6,7,8,9,10), ask=F)
+
+#credible intervals 
+confint(coef_model)
 
 #Test the model by seeing how to preforms when we plug in specific covariate values 
 
@@ -221,4 +231,21 @@ coef(model) provides beta, confint(model) provides beta and 95% credible interva
 
 #save predicted scores of F-MR and B-MR
 #plot against true values of alcohol use
+
+test <- finaldf[1,]
+predict_1 <- predict(backwards.model, test, interval="predict")
+alcohol_predictions <- 4
+prediction_freq <- data.frame("Test Subject" = "Student 1",
+                          "Predicted Alcohol Use" = sprintf("%2.1f", predict_1[1]),
+                          "95% CI" = sprintf("%2.1f-%2.1f", predict_1[2], predict_1[3]),
+                          "Actual Alcohol Use" = alcohol_predictions[1])
+predictions
+
+#bayesian model
+predict_1 <- predict(Full.Bayesian.Model, test, estimator="BMA", interval = "predict", se.fit=TRUE)
+prediction_bayes <- data.frame('Test Subject' = 'Student 1',
+           'Predicted Alcohol Use' = predict_1$Ybma, 
+           'Real Alcohol Use' = 4)
+prediction_bayes
+
 #could also try to fit values to second data set (F17)
