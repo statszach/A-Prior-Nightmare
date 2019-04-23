@@ -87,6 +87,7 @@ S18BaselineOnly$GPAB_Text<- as.numeric(S18BaselineOnly$GPAB_Text)
 #Replace all values  "Not listed, please fill in:" with text from GPAB_Text
 select <- S18BaselineOnly$GPAB=="Not listed, please fill in:"
 S18BaselineOnly[select, "GPAB"] <- S18BaselineOnly[select, "GPAB_Text"]
+
 #Cateorize GPA
 S18BaselineOnly$GPAB<- as.numeric(S18BaselineOnly$GPAB )
 S18BaselineOnly$GPAB <- ifelse(S18BaselineOnly$GPAB < 2.5, 1,
