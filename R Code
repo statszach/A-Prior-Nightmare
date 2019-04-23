@@ -153,6 +153,36 @@ describe(S18BaselineOnlyScored$DASS_Depression)
 ## DESCRIPTIVE STATISTICS ##
 ## AND DEMOGRAPHICS       ##
 ############################
+#test correlation of alcohol use and anxiety 
+cor(finaldf$AlcoholB, finaldf$DASS_Anxiety)
+
+#Check distribution of outcome- alcohol use
+alcohol.plot <- ggplot(finaldf, aes(x=finaldf$AlcoholB)) +
+  geom_histogram(fill="green", bins = 50)+
+  theme_bw()+
+  labs(x = "Alcohol Use", y= "Count", title = "Distribution of Alcohol Use")
+
+#Check distribution of explainatory variable-  Quantitative Anxiety 
+quant.anxiety.plot <- ggplot(finaldf, aes(x=finaldf$QuantAnxiety)) +
+  geom_histogram(fill="blue", bins =50)+
+  theme_bw()+
+  labs(x = "Quantitative Anxiety", y= "Count", title = "Distribution of Quantitative Anxiety")
+
+#summary statistics for alcohol
+finaldf %>% summarise(mean = round(mean(AlcoholB), 3), 
+                       sd = round(sd(AlcoholB), 3), 
+                       median = median(AlcoholB), 
+                       IQR = IQR(AlcoholB), 
+                       min = min(AlcoholB), 
+                       max = max(AlcoholB))
+
+#summary statistics for  Quantitative Anxiety
+finaldf %>% summarise(mean = round(mean(QuantAnxiety), 3), 
+                      sd = round(sd(QuantAnxiety), 3), 
+                      median = median(QuantAnxiety), 
+                      IQR = IQR(QuantAnxiety), 
+                      min = min(QuantAnxiety), 
+                      max = max(QuantAnxiety))
 
 #age, gender, race/ethnicity frequencies
 #M/SD for continuous covariates
