@@ -56,6 +56,43 @@ table(S18BaselineOnly$OtherQuantClassB)
 table(S18BaselineOnly$ExpGradeB)
 table(S18BaselineOnly$StuStaB)
 table(S18BaselineOnly$GPAB)
+#demographic recoding 
+#exclude values equal to 0 since they are missing 
+S18BaselineOnly <- S18BaselineOnly[S18BaselineOnly$GenderB!=0 & S18BaselineOnly$GenderB!="Transgender", ]
+#re-coding demographics 
+View(S18BaselineOnly)
+S18BaselineOnly$GenderB <- ifelse(S18BaselineOnly$GenderB == "Female", 0, ifelse(S18BaselineOnly$GenderB == "Male",1 ,99))
+
+S18BaselineOnly$RaceEth_B <- ifelse(S18BaselineOnly$RaceEth_B == "White/European Descent", 1, 0)
+
+S18BaselineOnly$OtherQuantClassB <- ifelse(S18BaselineOnly$OtherQuantClassB ==0,0, 
+                                    ifelse(S18BaselineOnly$OtherQuantClassB =="No", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "no",0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB =="Hell No", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "N/A", 0,
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "NO", 0,   
+                                    ifelse(S18BaselineOnly$OtherQuantClassB == "unknown", 0, 1)))))))
+
+S18BaselineOnly$ExpGradeB <-ifelse(S18BaselineOnly$ExpGradeB == "A", 3, 
+                            ifelse(S18BaselineOnly$ExpGradeB == "B",2,
+                            ifelse(S18BaselineOnly$ExpGradeB == "C",1,0)))
+
+S18BaselineOnly$StuStaB <-ifelse(S18BaselineOnly$StuStaB == "Freshman",1,
+                          ifelse(S18BaselineOnly$StuStaB=="Sophomore",2, 
+                          ifelse(S18BaselineOnly$StuStaB=="Junior",3, 
+                          ifelse(S18BaselineOnly$StuStaB=="Senior",4,
+                          ifelse(S18BaselineOnly$StuStaB=="Not listed, please fill in:",5,99)))))
+
+S18BaselineOnly$GPAB_Text<- as.numeric(S18BaselineOnly$GPAB_Text)
+#Replace all values  "Not listed, please fill in:" with text from GPAB_Text
+select <- S18BaselineOnly$GPAB=="Not listed, please fill in:"
+S18BaselineOnly[select, "GPAB"] <- S18BaselineOnly[select, "GPAB_Text"]
+#Cateorize GPA
+S18BaselineOnly$GPAB<- as.numeric(S18BaselineOnly$GPAB )
+S18BaselineOnly$GPAB <- ifelse(S18BaselineOnly$GPAB < 2.5, 1,
+                        ifelse(S18BaselineOnly$GPAB>=2.5&S18BaselineOnly$GPAB<3, 2,
+                        ifelse(S18BaselineOnly$GPAB>=3 & S18BaselineOnly$GPAB <3.5, 3,
+                        ifelse(S18BaselineOnly$GPAB>=3.5,4,99 ))))
 
 #Scoring Scales 
 #Remember - using RowMeans in case of any items missing within-measure
@@ -70,13 +107,19 @@ DASSDepressionItems <- c("DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"D
 
 OtherQuantClassB,	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB"
 
-S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(QuantClassB,  AlcoholB, BingeB,
+S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(AlcoholB, BingeB,
   QuantAnxiety = rowMeans(select(., QuantAnxietyItems)),
   ExamAnxiety = rowMeans(select(., ExamAnxietyItems)),
   SubsUseScreener = rowMeans(select(., SAScreenerItems)),                                                      
   DASS_Stress = rowMeans(select(., DASSStressItems)),
   DASS_Anxiety = rowMeans(select(., DASSAnxietyItems)),
   DASS_Depression = rowMeans(select(., DASSDepressionItems))
+  Gender = S18BaselineOnly$GenderB,
+  Year = S18BaselineOnly$StuStaB,
+  QuantativeClass =S18BaselineOnly$OtherQuantClassB,
+  Expected_Grade = S18BaselineOnly$ExpGradeB,
+  Race = S18BaselineOnly$RaceEth_B, 
+  GPA = S18BaselineOnly$GPAB
   )
 
 
