@@ -108,7 +108,7 @@ DASSDepressionItems <- c("DASS8B",	"DASS9B",	"DASS10B",	"DASS11B",	"DASS12B",	"D
 
 OtherQuantClassB,	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB"
 
-S18BaselineOnlyScored <- S18BaselineOnly %>% transmute(AlcoholB, BingeB,
+finaldf <- S18BaselineOnly %>% transmute(AlcoholB, BingeB,
   QuantAnxiety = rowMeans(select(., QuantAnxietyItems)),
   ExamAnxiety = rowMeans(select(., ExamAnxietyItems)),
   SubsUseScreener = rowMeans(select(., SAScreenerItems)),                                                      
@@ -163,12 +163,34 @@ describe(S18BaselineOnlyScored$DASS_Depression)
 ####################
 
 #Run Full Model
-Full.Frequentist.Model <- lm(AlcoholUseB ~ ., data = BeginningOnlyImputed)
+Full.Frequentist.Model <- lm(AlcoholB ~ ., data = na.omit(finaldf))
 summary(Full.Frequentist.Model)
 plot(Full.Frequentist.Model)
+tidy(Full.Frequentist.Model, conf.int = TRUE)[,-c(3:4)]
 
 #Use backwards elimination to remove variables
-step(Full.Frequentist.Model, direction = "backward", trace=FALSE)
+backwards.model <- step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+summary(backwards.model)
+tidy(backwards.model, conf.int = TRUE)[,-c(3:4)]
+
+#linearity 
+plot(backwards.model,1)
+
+#homogenous variance assumption tested by standardized residual plots
+library(olsrr)
+ols_rvsp_plot(backwards.model)
+ols_score_test(backwards.model)
+ols_f_test(backwards.model)
+
+#normal distribution of errors
+plot(backwards.model,2)
+
+#mean of residuals is 0
+mean(backwards.model$residuals)
+
+#check for outliers 
+ols_plot_dfbetas(backwards.model)
+ols_plot_dffits(backwards.model)
 
 #At this point, re-run reduced model, interpret results, plot for diagnostics if needed
 
