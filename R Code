@@ -230,7 +230,7 @@ ols_plot_dffits(backwards.model)
 
 #Run Full Model. We probably want to be crystal clear why we're choosing the ZS-null and uniform priors in the paper.
 
-Full.Bayesian.Model <- bas.lm(AlcoholB ~ AlcoholB ~ .,
+Full.Bayesian.Model <- bas.lm(AlcoholB ~ .,
                               data =finaldf, 
                               method = "MCMC",
                               prior = "ZS-null",
