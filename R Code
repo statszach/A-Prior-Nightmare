@@ -68,6 +68,12 @@ S18BaselineOnly$RaceEth_B <- ifelse(S18BaselineOnly$RaceEth_B == "White/European
 S18BaselineOnly$PellGrantM <- ifelse(S18BaselineOnly$PellGrantM == "Yes", 1,
                               ifelse(S18BaselineOnly$PellGrantM == "No",0,99))
 
+S18BaselineOnly$RelStaM <- ifelse(S18BaselineOnly$RelStaM == "Single",1,
+                            ifelse(S18BaselineOnly$RelStaM== "In a Relationship",2,
+                            ifelse(S18BaselineOnly$RelStaM == "Divorced",3,
+                            ifelse(S18BaselineOnly$RelStaM == "Widowed",3,
+                            ifelse(S18BaselineOnly$RelStaM == "Married Not Listed, please Fill In:",3,99)))))
+
 S18BaselineOnly$OtherQuantClassB <- ifelse(S18BaselineOnly$OtherQuantClassB ==0,0, 
                                     ifelse(S18BaselineOnly$OtherQuantClassB =="No", 0,
                                     ifelse(S18BaselineOnly$OtherQuantClassB == "no",0,
@@ -124,6 +130,7 @@ finaldf <- S18BaselineOnly %>% transmute(AlcoholB, BingeB,
   Expected_Grade = S18BaselineOnly$ExpGradeB,
   Race = S18BaselineOnly$RaceEth_B, 
   GPA = S18BaselineOnly$GPAB
+  Relationship = S18BaselineOnly$RelStaM 
   )
 
 
