@@ -33,7 +33,7 @@ S18 <- ThesisSP18Data
 
 #Subset for beginning of semester only
 
-S18BaselineItems <- c("QuantClassB",	"OtherQuantClassB",	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB",	"GPAB_Text",
+S18BaselineItems <- c("QuantClassB",	"PellGrantM", "RelStaM","RelStaM_Text","OtherQuantClassB",	"GenderB",	"GenderB_Text",	"RaceEth_B",	"RaceEthB_Text",	"ExpGradeB",	"StuStaB",	"StuStaB_Text", "GPAB",	"GPAB_Text",
 "QANX1B",	"QANX2B",	"QANX3B",	"QANX4B",	
 "SAS1B",	"SAS2B",	"SAS3B",	"SAS4B",	"SAS5B",	"SAS6B",	"SAS7B",	"SAS8B",	"SAS9B",	"SAS10B",	"SAS11B",	"SAS12B",	"SAS13B",	"SAS14B",	"SAS15B",
 "AlcoholYNB",	"AlcoholB",	"BingeYNB",	"BingeB",	
@@ -64,6 +64,9 @@ View(S18BaselineOnly)
 S18BaselineOnly$GenderB <- ifelse(S18BaselineOnly$GenderB == "Female", 0, ifelse(S18BaselineOnly$GenderB == "Male",1 ,99))
 
 S18BaselineOnly$RaceEth_B <- ifelse(S18BaselineOnly$RaceEth_B == "White/European Descent", 1, 0)
+
+S18BaselineOnly$PellGrantM <- ifelse(S18BaselineOnly$PellGrantM == "Yes", 1,
+                              ifelse(S18BaselineOnly$PellGrantM == "No",0,99))
 
 S18BaselineOnly$OtherQuantClassB <- ifelse(S18BaselineOnly$OtherQuantClassB ==0,0, 
                                     ifelse(S18BaselineOnly$OtherQuantClassB =="No", 0,
