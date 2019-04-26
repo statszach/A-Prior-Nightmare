@@ -179,13 +179,61 @@ finaldf %>% summarise(mean = round(mean(AlcoholB), 3),
                        min = min(AlcoholB), 
                        max = max(AlcoholB))
 
+##############Distress Variables#################
+#summary statistics for alcohol
+finaldf %>% summarise(mean = round(mean(AlcoholB), 3), 
+                       sd = round(sd(AlcoholB), 3), 
+                       median = median(AlcoholB), 
+                       IQR = IQR(AlcoholB), 
+                       min = min(AlcoholB), 
+                       max = max(AlcoholB))
+        
+
 #summary statistics for  Quantitative Anxiety
 finaldf %>% summarise(mean = round(mean(QuantAnxiety), 3), 
                       sd = round(sd(QuantAnxiety), 3), 
                       median = median(QuantAnxiety), 
                       IQR = IQR(QuantAnxiety), 
                       min = min(QuantAnxiety), 
-                      max = max(QuantAnxiety))
+                      max = max(QuantAnxiety),
+                      skew = skewness(QuantAnxiety),
+                      kurt = kurtosis(QuantAnxiety))
+                      
+#summary statistics for Exam Anxiety 
+finaldf %>% summarise(mean = round(mean(ExamAnxiety), 3), 
+                      sd = round(sd(ExamAnxiety), 3), 
+                      median = median(ExamAnxiety), 
+                      min = min(ExamAnxiety), 
+                      max = max(ExamAnxiety),
+                      skew = skewness(ExamAnxiety),
+                      kurt = kurtosis(ExamAnxiety))
+                      
+#summary statistic for stress
+finaldf %>% summarise(mean = round(mean(DASS_Stress), 3), 
+                      sd = round(sd(DASS_Stress), 3), 
+                      median = median(DASS_Stress), 
+                      min = min(DASS_Stress), 
+                      max = max(DASS_Stress),
+                      skew = skewness(DASS_Stress),
+                      kurt = kurtosis(DASS_Stress))
+                      
+#summary statistics for depression 
+finaldf %>% summarise(mean = round(mean(DASS_Depression), 3), 
+                      sd = round(sd(DASS_Depression), 3), 
+                      median = median(DASS_Depression), 
+                      min = min(DASS_Depression), 
+                      max = max(DASS_Depression),
+                      skew = skewness(DASS_Depression),
+                      kurt = kurtosis(DASS_Depression))
+                      
+#summary statistics for anxiety 
+finaldf %>% summarise(mean = round(mean(DASS_Anxiety), 3), 
+                      sd = round(sd(DASS_Anxiety), 3), 
+                      median = median(DASS_Anxiety), 
+                      min = min(DASS_Anxiety), 
+                      max = max(DASS_Anxiety),
+                      skew = skewness(DASS_Anxiety),
+                      kurt = kurtosis(DASS_Anxiety))
 
 #age, gender, race/ethnicity frequencies
 #M/SD for continuous covariates
