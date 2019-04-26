@@ -337,3 +337,59 @@ prediction_bayes <- data.frame('Test Subject' = 'Student 1',
 prediction_bayes
 
 #could also try to fit values to second data set (F17)
+
+######################################
+##Bayesian Regression Model METHOD 2##
+######################################
+#Frequentist Model 
+Full.Frequentist.Model <- lm(AlcoholM ~ ., data = na.omit(finaldf))
+lmfit <-step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+
+QR<-lmfit$qr
+df.residual<-lmfit$df.residual
+R<-qr.R(QR) ## R component
+coef<-lmfit$coef
+Vb<-chol2inv(R) ## variance(unscaled)
+s2<-(t(lmfit$residuals)%*%lmfit$residuals)
+s2<-s2[1,1]/df.residual
+
+## function to compute the bayesian analog of the lmfit
+## using non-informative priors and Monte Carlo scheme
+## based on N samples
+bayesfit<-function(lmfit,N){
+  QR<-lmfit$qr
+  df.residual<-lmfit$df.residual
+  R<-qr.R(QR) ## R component
+  coef<-lmfit$coef
+  Vb<-chol2inv(R) ## variance(unscaled)
+  s2<-(t(lmfit$residuals)%*%lmfit$residuals)
+  s2<-s2[1,1]/df.residual
+  
+## now to sample residual variance
+  sigma<-df.residual*s2/rchisq(N,df.residual)
+  coef.sim<-sapply(sigma,function(x) mvrnorm(1,coef,Vb*x))
+  ret<-data.frame(t(coef.sim))
+  names(ret)<-names(lmfit$coef)
+  ret$sigma<-sqrt(sigma)
+  ret
+}
+
+#Summarize Monte Carlo estimates 
+Bayes.sum<-function(x)
+{
+  c("mean"=mean(x),
+    "se"=sd(x),
+    "t"=mean(x)/sd(x),
+    "median"=median(x),
+    "CrI"=quantile(x,prob=0.025),
+    "CrI"=quantile(x,prob=0.975)
+  )
+}
+
+#contrast Bayesian and frequentist estimates
+set.seed(123)  ## reproducible sim
+bf<-bayesfit(lmfit,10000)
+t(apply(bf,2,Bayes.sum))
+
+#call function summary
+summary(lmfit)
