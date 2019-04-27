@@ -393,3 +393,45 @@ t(apply(bf,2,Bayes.sum))
 
 #call function summary
 summary(lmfit)
+
+##############################################
+##Bayesian Regression Model 1: Uniform Prior##
+##############################################
+
+###USE ME!!!###
+
+library(dplyr)
+library(lgarch)
+
+#plot between alcohol use and quantative anxiety 
+#set up frequentist model 
+Full.Frequentist.Model <- lm(AlcoholB ~ ., data = na.omit(finaldf))
+summary(Full.Frequentist.Model)
+plot(Full.Frequentist.Model)
+tidy(Full.Frequentist.Model, conf.int = TRUE)[,-c(3:4)]
+
+#Use backwards elimination to remove variables
+backwards.model <- step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+fit <- backwards.model
+summary(backwards.model)
+tidy(backwards.model, conf.int = TRUE)[,-c(3:4)]
+#sample betas
+sampBeta = function(fit, m)
+{
+  bhat = matrix(fit$coef, c(1, fit$rank))
+  beta.m = bhat
+  vbeta = vcov(fit)/s2
+  sigma = sqrt(1/rgamma(m, shape = shape, rate = rate))
+  beta = rmnorm(m, mean = rep(0, fit$rank), vcov(fit)/s2)
+  beta = array(1, c(m, 1)) %*% beta.m + array(sigma, c(m, fit$rank)) * beta
+  return(list(beta = beta, sigma = sigma))
+}
+#distributions 
+hist(theta.sample$beta[,1],main="Intercept", xlab=expression(beta[1]))
+intercept <- plot(density(theta.sample$beta[,2]), main="Distribution of Intercept",col="blue")
+
+hist(theta.sample$beta[,2],main="Age", xlab=expression(beta[1]))
+age <- plot(density(theta.sample$beta[,2]), main="Distribution of Age")
+
+hist(theta.sample$beta[,3],main="Quant Anxiety")
+quant <- plot(density(theta.sample$beta[,3]), main="Distribution of Intercept",col="red")
