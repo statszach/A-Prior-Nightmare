@@ -282,36 +282,43 @@ ols_plot_dffits(backwards.model)
 
 #At this point, re-run reduced model, interpret results, plot for diagnostics if needed
 
+
+####################
+## FREQUENTIST MR ##
+####################
+
+#Run Full Model
+
+Full.Frequentist.Model <- with(S18Imputed, lm(AlcoholM ~ Gender + RaceEth + PellGrant + RelSta + StuSta + StaCourse + AnotherStaCourse + QuantAnxiety + ExamAnxiety + SubsUseScreener + DASS_Stress + DASS_Anxiety + DASS_Depression))
+
+round(summary(pool(Full.Frequentist.Model), conf.int = TRUE), 3)
+
+pool.r.squared(Full.Frequentist.Model, adjusted = F)
+
+summary(Full.Frequentist.Model)
+plot(Full.Frequentist.Model)
+
+#Use backwards elimination to remove variables
+
+Step.Frequentist.Model <- with(S18Imputed, step(Full.Frequentist.Model, direction = "backward", trace=FALSE))
+
+#At this point, re-run reduced model, interpret results, plot for diagnostics if needed
+
 #################
 ## BAYESIAN MR ##
 #################
 
 #Run Full Model. We probably want to be crystal clear why we're choosing the ZS-null and uniform priors in the paper.
 
-Full.Bayesian.Model <- bas.lm(AlcoholB ~ .,
-                              data =finaldf, 
-                              method = "MCMC",
-                              prior = "ZS-null",
-                              modelprior = uniform())
-summary(Full.Bayesian.Model)
+Full.Bayesian.Model <- with(S18Imputed, bas.lm(AlcoholM ~ Gender + RaceEth + PellGrant + RelSta + StuSta + StaCourse + AnotherStaCourse + QuantAnxiety + ExamAnxiety + SubsUseScreener + DASS_Stress + DASS_Anxiety + DASS_Depression, method = "MCMC", prior = "ZS-null", modelprior = uniform()))
 
+summary(Full.Bayesian.Model)
 #Use results from the summary to create the reduced model. Compare and contrast with frequentist/backwards selection results.
 
 #At this point, re-run reduced model, interpret results, provide plots.
 
-#Compare posterior distribution of beta values to posterior expected value of predictions 
-coef_model <- coef(Full.Bayesian.Model)
-par(mfrow=c(2,5))
-plot(coef_model, subset = c(1,2,3,4,5,6,7,8,9,10), ask=F)
-
-#credible intervals 
-confint(coef_model)
-
-#Test the model by seeing how to preforms when we plug in specific covariate values 
-
-#Examine outliers by Bayesian residual analysis 
-
 coef(model) provides beta, confint(model) provides beta and 95% credible intervals
+
 
 ############################
 ## PREDICTIVE PERFORMANCE ##
