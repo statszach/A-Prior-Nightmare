@@ -1,1 +1,93 @@
+#################
+##Uniform Model##
+#################
+
+#set up frequentist model 
+Full.Frequentist.Model <- lm(AlcoholM ~ ., data = na.omit(finaldfupdate))
+summary(Full.Frequentist.Model)
+plot(Full.Frequentist.Model)
+tidy(Full.Frequentist.Model, conf.int = TRUE)[,-c(3:4)]
+
+#Use backwards elimination to remove variables
+backwards.model <- step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+summary(backwards.model)
+fit <- backwards.model
+#sample betas 
+s2 = sum(fit$residuals^2)/fit$df.residual
+shape = fit$df.residual/2
+rate = fit$df.residual/2 * s2
+
+sampBeta = function(fit, m)
+{
+  bhat = matrix(fit$coef, c(1, fit$rank))
+  beta.m = bhat
+  vbeta = vcov(fit)/s2
+  sigma = sqrt(1/rgamma(m, shape = shape, rate = rate))
+  beta = rmnorm(m, mean = rep(0, fit$rank), vcov(fit)/s2)
+  beta = array(1, c(m, 1)) %*% beta.m + array(sigma, c(m, fit$rank)) * beta
+  return(list(beta = beta, sigma = sigma))
+}
+#sample theta values
+theta.sample= sampBeta(fit, m=1000)
+par(mfrow=c(4,2))
+#'posterior distribution for each of our betas 
+plot(density(theta.sample$beta[,2]), main="Quantitative Anxiety",col="blue")
+plot(density(theta.sample$beta[,3]), main="Exam Anxiety",col="red")
+plot(density(theta.sample$beta[,4]), main="Substance Use",col="orange")
+plot(density(theta.sample$beta[,5]), main="DASS Stress",col="purple")
+plot(density(theta.sample$beta[,5]), main="Year",col="pink")
+plot(density(theta.sample$beta[,6]), main="Enrollment in Quantitative Class",col="pink")
+plot(density(theta.sample$beta[,7]), main="Race",col="brown")
+plot(density(theta.sample$sigma), main="Error Standard Deviation",col="yellow ")
+
+#quantiles 
+summary(fit)
+quantile(theta.sample$beta[,1], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,2], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,3], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,4], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,5], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,6], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,7], probs =c(.025,.25,.5,.75,.975))
+quantile(theta.sample$beta[,8], probs =c(.025,.25,.5,.75,.975))
+
+#####################
+##Normal Prior Model##
+######################
+library(spBayes)
+n = nrow(finaldfupdate)
+p = 8 ##an intercept and six covariates
+
+n.samples <- 1000
+
+## Below we demonstrate the conjugate function in the special case
+## with improper priors. The results are the same as for the above,
+## up to MC error. 
+beta.prior.mean <- rep(0, times=p)
+beta.prior.precision <- matrix(0, nrow=p, ncol=p)
+
+prior.shape <- -p/2
+prior.rate <- 0
+
+#I have no idea why I can't just call the backwards selection model, so I just manually put it in
+m.1 <-bayesLMConjugate(formula = AlcoholM ~ QuantAnxiety + ExamAnxiety + SubsUseScreener + 
+                         DASS_Stress + Year + QuantativeClass + Race, data = finaldfupdate,
+                       n.samples, beta.prior.mean,
+                       beta.prior.precision,
+                       prior.shape, prior.rate)
+
+summary(m.1$p.beta.tauSq.samples)
+hist(m.1$p.beta[,2])
+
+#Distributions 
+par(mfrow=c(4,2))
+#'posterior distribution for each of our betas 
+plot(density(m.1$p.beta[,2]), main="Quantitative Anxiety",col="blue")
+plot(density(m.1$p.beta[,3]), main="Exam Anxiety",col="red")
+plot(density(m.1$p.beta[,4]), main="Substance Use",col="orange")
+plot(density(m.1$p.beta[,5]), main="DASS Stress",col="purple")
+plot(density(m.1$p.beta[,6]), main="Year",col="pink")
+plot(density(m.1$p.beta[,7]), main="Enrollment in Quantitative Class",col="pink")
+plot(density(m.1$p.beta[,8]), main="Race",col="brown")
+plot(density(m.1$sigma), main="Error Standard Deviation",col="yellow ")
 
