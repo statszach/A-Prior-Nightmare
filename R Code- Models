@@ -51,9 +51,9 @@ quantile(theta.sample$beta[,6], probs =c(.025,.25,.5,.75,.975))
 quantile(theta.sample$beta[,7], probs =c(.025,.25,.5,.75,.975))
 quantile(theta.sample$beta[,8], probs =c(.025,.25,.5,.75,.975))
 
-#####################
-##Normal Prior Model##
-######################
+#########################################
+##Model with Inverse Gamma/Normal Prior##
+#########################################
 library(spBayes)
 n = nrow(finaldfupdate)
 p = 8 ##an intercept and six covariates
@@ -91,3 +91,76 @@ plot(density(m.1$p.beta[,7]), main="Enrollment in Quantitative Class",col="pink"
 plot(density(m.1$p.beta[,8]), main="Race",col="brown")
 plot(density(m.1$sigma), main="Error Standard Deviation",col="yellow ")
 
+########################################
+##Hierarchical Model with Normal Prior##
+########################################
+library(rjags)
+library(tidyverse)
+#frequentist 
+Full.Frequentist.Model <- lm(AlcoholM ~ ., data = na.omit(finaldfupdate))
+summary(Full.Frequentist.Model)
+
+#Use backwards elimination to remove variables
+backwards.model <- step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+summary(backwards.model)
+fit <- backwards.model
+
+#follow tutorial 
+#https://www4.stat.ncsu.edu/~reich/ST590/code/regJAGS
+
+#create data
+data <- finaldfupdate
+data <- data[,-12]
+data <- as.data.frame(data)
+n <- length(finaldfupdate$AlcoholM)
+Y <- data[,1]
+quant_anxiety <- data[,3]
+exam_anxiety <- data[,4]
+dass_stress <- data[,6]
+sub_use <- data[,"SubsUseScreener"]
+year <- data[,10]
+quant_class <- data[,11]
+race <- data[,"Race"]
+model_string <- "model{
+  # Likelihood
+for(i in 1:n){
+Y[i]   ~ dnorm(mu[i],inv.var)
+mu[i] <- beta[1] + beta[2]*quant_anxiety[i] + beta[3]*exam_anxiety[i] + beta[4]*sub_use[i] +beta[5]*dass_stress[i] + beta[6]*year[i] + beta[7]*quant_class[i] + beta[8]*race[i]
+}
+# Prior for beta
+for(j in 1:9){
+beta[j] ~ dnorm(0,0.0001)
+}
+# Prior for the inverse variance
+inv.var   ~ dgamma(0.01, 0.01)
+sigma     <- 1/sqrt(inv.var)
+}"
+
+#put in the model 
+model <- jags.model(textConnection(model_string), 
+                    data = list(Y=Y,n=n,quant_anxiety=quant_anxiety,exam_anxiety=exam_anxiety,dass_stress=dass_stress,sub_use= sub_use,year=year,quant_class=quant_class,race=race))
+
+#draw samples
+update(model, 10000, progress.bar="none"); # Burnin for 10000 samples
+samp <- coda.samples(model, 
+                     variable.names=c("beta","sigma"), 
+                     n.iter=20000, progress.bar="none")
+summary(samp)
+#trace plots 
+plot(samp)
+
+########################################
+##Hierarchical Model with Normal Prior##
+########################################
+library(blme)
+backwards.model <- step(Full.Frequentist.Model, direction = "backward",trace = FALSE)
+summary(backwards.model)
+fit <- backwards.model
+data <- finaldfupdate
+
+data$Class <- as.factor(data$Class)
+
+#this creates a fixed effect model with different varying slopes for class types 
+(fm1 <- blmer(AlcoholM ~ Class + SubsUseScreener +QuantAnxiety + ExamAnxiety + SubsUseScreener + DASS_Stress + Year+ QuantativeClass + Race + Class+ (1|Class), data,
+              cov.prior = gamma,
+              fixef.prior = normal))
